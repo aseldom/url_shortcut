@@ -35,4 +35,8 @@ public class Site {
         this.login = login;
         this.password = password;
     }
+
+    public Site(String login) {
+        this.login = login;
+    }
 }

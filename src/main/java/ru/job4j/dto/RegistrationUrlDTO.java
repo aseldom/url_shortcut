@@ -10,4 +10,6 @@ public class RegistrationUrlDTO {
     @NotBlank
     private String url;
 
+    private  String site;
+
 }

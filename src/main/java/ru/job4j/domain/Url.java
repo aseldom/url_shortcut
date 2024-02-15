@@ -29,10 +29,16 @@ public class Url {
     private String hashCode;
 
     @PositiveOrZero
-    private int counter;
+    @Column(name = "counter")
+    private int total;
 
-    public Url(String url, String hashCode) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "site_id")
+    private Site site;
+
+    public Url(String url, String hashCode, Site site) {
         this.url = url;
         this.hashCode = hashCode;
+        this.site = site;
     }
 }

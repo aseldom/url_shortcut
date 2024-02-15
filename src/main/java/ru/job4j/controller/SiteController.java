@@ -4,14 +4,13 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.job4j.dto.RegistrationDTO;
-import ru.job4j.dto.RegistrationResponseDTO;
-import ru.job4j.dto.RegistrationUrlDTO;
-import ru.job4j.dto.ResponseUrlDTO;
+import ru.job4j.dto.*;
 import ru.job4j.service.SiteService;
 import ru.job4j.service.UrlService;
 
 import javax.validation.Valid;
+import java.security.Principal;
+import java.util.Collection;
 
 @AllArgsConstructor
 @RestController
@@ -22,14 +21,15 @@ public class SiteController {
     private final UrlService urlService;
 
     @PostMapping("/registration")
-    public ResponseEntity<RegistrationResponseDTO> registerSite(@RequestBody @Valid RegistrationDTO registrationDTO) {
+    public ResponseEntity<RegistrationResponseDTO> registerSite(@Valid @RequestBody RegistrationDTO registrationDTO) {
         return siteService.save(registrationDTO)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.CONFLICT).build());
     }
 
     @PostMapping("/convert")
-    public ResponseEntity<ResponseUrlDTO> registerUrl(@RequestBody @Valid RegistrationUrlDTO registrationUrlDTO) {
+    public ResponseEntity<ResponseUrlDTO> registerUrl(@Valid @RequestBody RegistrationUrlDTO registrationUrlDTO, Principal principal) {
+        registrationUrlDTO.setSite(principal.getName());
         return urlService.save(registrationUrlDTO)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.CONFLICT).build());
@@ -42,6 +42,15 @@ public class SiteController {
                         .status(HttpStatus.OK)
                         .header("HTTP CODE - 302 ", url.getUrl()).build())
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+
+    }
+
+    @GetMapping("/statistic")
+    public ResponseEntity<?> getStatistic(Principal principal) {
+        Collection<ResponseStatisticDTO> statisticDTO = urlService.findAllBySite(principal.getName());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(statisticDTO);
 
     }
 
