@@ -16,6 +16,7 @@ import ru.job4j.repository.SiteRepository;
 import ru.job4j.repository.UrlRepository;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -61,8 +62,11 @@ public class UrlServiceImpl implements UrlService {
 
     @Override
     public Collection<ResponseStatisticDTO> findAllBySite(String siteLogin) {
-        Site site = siteRepository.findByLogin(siteLogin).get();
-        Collection<Url> urls = urlRepository.findAllBySite(site);
+        Optional<Site> optionalSite = siteRepository.findByLogin(siteLogin);
+        if (optionalSite.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Collection<Url> urls = urlRepository.findAllBySite(optionalSite.get());
         return mapper.getResponseStatisticDTO(urls);
     }
 

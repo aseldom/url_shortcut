@@ -35,7 +35,7 @@
 ## Работа с приложением (пример):
 1) Регистрация сайта:
    - (POST) URL: http://localhost:8080/site/registration/
-     - тело JSON объекта {site : "job4j.ru"}
+     - тело JSON объекта {"site" : "job4j.ru"}
    - Ответ сервера: {registration : true/false, login: УНИКАЛЬНЫЙ_КОД, password : УНИКАЛЬНЫЙ_КОД}, где login и password необходимы для авторизации.
 2) Авторизация.
     - (POST) URL: http://localhost:8080/login
@@ -60,5 +60,7 @@
          }
 ---
  Взаимодействие с приложением удобнее осуществлять через [Postman](https://www.postman.com/)
+---
+####Контакты для связи:
 
              
