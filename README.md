@@ -59,8 +59,7 @@
          {url : "https://job4j.ru/doogle.com/mail", total : 103}
          }
 ---
- Взаимодействие с приложением удобнее осуществлять через [Postman](https://www.postman.com/)
----
-####Контакты для связи:
+#### Взаимодействие с приложением удобнее осуществлять через [Postman](https://www.postman.com/)
+
 
              
