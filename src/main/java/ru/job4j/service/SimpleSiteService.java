@@ -1,8 +1,9 @@
 package ru.job4j.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.job4j.domain.Site;
@@ -14,19 +15,24 @@ import ru.job4j.repository.SiteRepository;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SimpleSiteService implements SiteService {
 
-    final static Logger LOGGER = LoggerFactory.getLogger(SimpleSiteService.class);
-    private BCryptPasswordEncoder encoder;
+    private final static Logger LOGGER = LoggerFactory.getLogger(SimpleSiteService.class);
+    private final BCryptPasswordEncoder encoder;
     private final SiteRepository siteRepository;
     private final SiteMapper siteMapper;
+
+    @Value("${password.begin.character}")
+    private int begin;
+    @Value("${password.length}")
+    private int length;
 
     @Override
     public Optional<RegistrationResponseDTO> save(RegistrationDTO registrationDTO) {
         if (findByLogin(registrationDTO.getSite()).isEmpty()) {
             try {
-                String password = getPassword();
+                String password = getPassword(begin, length);
                 Site site = new Site(
                         registrationDTO.getSite(),
                         getHash(password)
@@ -46,8 +52,8 @@ public class SimpleSiteService implements SiteService {
         return siteRepository.findByLogin(login);
     }
 
-    private String getPassword() {
-        return encoder.encode(String.valueOf(Math.random())).substring(8, 14);
+    private String getPassword(int begin, int length) {
+        return encoder.encode(String.valueOf(Math.random())).substring(begin, begin + length);
     }
 
     private String getHash(String password) {
