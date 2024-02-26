@@ -27,18 +27,18 @@ public class GlobalExceptionHandler {
     private final ObjectMapper objectMapper;
 
     @ExceptionHandler(value = {NullPointerException.class})
-    public void handleException(Exception e, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void handleNPE(Exception e, HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         response.setContentType("application/json");
         response.getWriter().write(objectMapper.writeValueAsString(new HashMap<>() { {
             put("message", "Some of fields empty");
             put("details", e.getMessage());
         }}));
-        LOGGER.error(e.getMessage());
+        LOGGER.error(e.toString());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handle(MethodArgumentNotValidException e) {
+    public ResponseEntity<?> handleMethodArgument(MethodArgumentNotValidException e) {
         return ResponseEntity.badRequest().body(
                 e.getFieldErrors().stream()
                         .map(f -> Map.of(
@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<?> handle(ConstraintViolationException e) {
+    public ResponseEntity<?> handleConstraintViolation(ConstraintViolationException e) {
         return ResponseEntity.badRequest().body(e.getConstraintViolations().stream()
                 .map(
                         violation -> Map.of(

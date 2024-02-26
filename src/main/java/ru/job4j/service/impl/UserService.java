@@ -1,4 +1,4 @@
-package ru.job4j.service;
+package ru.job4j.service.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.User;
@@ -15,7 +15,7 @@ import static java.util.Collections.emptyList;
 
 @AllArgsConstructor
 @Service
-public class SiteServiceImpl implements UserDetailsService {
+public class UserService implements UserDetailsService {
 
     private SiteRepository siteRepository;
 

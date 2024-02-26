@@ -15,7 +15,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ru.job4j.filter.JWTAuthenticationFilter;
 import ru.job4j.filter.JWTAuthorizationFilter;
-import ru.job4j.service.SiteServiceImpl;
+import ru.job4j.service.impl.UserService;
 
 import static ru.job4j.filter.JWTAuthenticationFilter.SIGN_UP_URL;
 
@@ -24,7 +24,7 @@ import static ru.job4j.filter.JWTAuthenticationFilter.SIGN_UP_URL;
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter  {
 
-    private SiteServiceImpl siteService;
+    private UserService userService;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
@@ -42,7 +42,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter  {
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(siteService).passwordEncoder(bCryptPasswordEncoder);
+        auth.userDetailsService(userService).passwordEncoder(bCryptPasswordEncoder);
     }
 
     @Bean
@@ -51,4 +51,5 @@ public class WebSecurity extends WebSecurityConfigurerAdapter  {
         source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
         return source;
     }
+
 }

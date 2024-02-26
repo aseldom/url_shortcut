@@ -1,4 +1,4 @@
-package ru.job4j.service;
+package ru.job4j.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import ru.job4j.domain.Site;
 import ru.job4j.dto.RegistrationDTO;
 import ru.job4j.dto.RegistrationResponseDTO;
+import ru.job4j.exception.ServiceException;
 import ru.job4j.mapper.SiteMapper;
 import ru.job4j.repository.SiteRepository;
+import ru.job4j.service.SiteService;
 
 import java.util.Optional;
 
@@ -29,22 +31,19 @@ public class SimpleSiteService implements SiteService {
     private int length;
 
     @Override
-    public Optional<RegistrationResponseDTO> save(RegistrationDTO registrationDTO) {
-        if (findByLogin(registrationDTO.getSite()).isEmpty()) {
-            try {
-                String password = getPassword(begin, length);
-                Site site = new Site(
-                        registrationDTO.getSite(),
-                        getHash(password)
-                );
-                siteRepository.save(site).setPassword(password);
-                RegistrationResponseDTO dto = siteMapper.getRegistrationResponseDTO(site);
-                return Optional.of(dto);
-            } catch (Exception e) {
-                LOGGER.error("Error save person: " + e.getMessage());
-            }
+    public RegistrationResponseDTO save(RegistrationDTO registrationDTO) throws ServiceException {
+        String password = getPassword(begin, length);
+        Site site = new Site(
+                registrationDTO.getSite(),
+                getHash(password)
+        );
+        try {
+            siteRepository.save(site).setPassword(password);
+            return siteMapper.getRegistrationResponseDTO(site);
+        } catch (Exception e) {
+            LOGGER.error("Error save site: ", e);
+            throw new ServiceException("can't save site", e);
         }
-        return Optional.of(new RegistrationResponseDTO(registrationDTO.getSite()));
     }
 
     @Override

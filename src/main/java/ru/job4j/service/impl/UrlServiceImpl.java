@@ -1,4 +1,4 @@
-package ru.job4j.service;
+package ru.job4j.service.impl;
 
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -10,10 +10,12 @@ import ru.job4j.domain.Url;
 import ru.job4j.dto.RegistrationUrlDTO;
 import ru.job4j.dto.ResponseStatisticDTO;
 import ru.job4j.dto.ResponseUrlDTO;
+import ru.job4j.exception.ServiceException;
 import ru.job4j.mapper.SiteMapper;
 import ru.job4j.repository.CrudRepository;
 import ru.job4j.repository.SiteRepository;
 import ru.job4j.repository.UrlRepository;
+import ru.job4j.service.UrlService;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -33,29 +35,26 @@ public class UrlServiceImpl implements UrlService {
     private final SiteMapper mapper;
 
     @Override
-    public Optional<ResponseUrlDTO> save(RegistrationUrlDTO urlDTO) {
+    public ResponseUrlDTO save(RegistrationUrlDTO urlDTO) throws ServiceException {
         try {
             Optional<Site> optionalSite = siteRepository.findByLogin(urlDTO.getSite());
-            if (optionalSite.isPresent()) {
-                Url url = new Url(urlDTO.getUrl(), getHashCode(), optionalSite.get());
-                urlRepository.save(url);
-                return Optional.of(new ResponseUrlDTO(url.getHashCode()));
+            if (optionalSite.isEmpty()) {
+                throw new RuntimeException("Can't find site in database");
             }
-
+            Url url = new Url(urlDTO.getUrl(), getHashCode(), optionalSite.get());
+            urlRepository.save(url);
+            return new ResponseUrlDTO(url.getHashCode());
         } catch (Exception e) {
-        LOGGER.error("Error save URL: " + e.getMessage());
-    }
-        return Optional.empty();
+        LOGGER.error("Error save URL: ", e);
+        throw new ServiceException("Error save URL", e);
+        }
     }
 
     @Override
     public Optional<Url> findByHashCode(String hashCode) {
         Optional<Url> optionalUrl = urlRepository.findByHashCode(hashCode);
         if (optionalUrl.isPresent()) {
-            crudRepository.runWithConfirm(
-                    "UPDATE Url SET counter = counter + 1 WHERE hashCode = :fHashCode",
-                    Map.of("fHashCode", hashCode)
-            );
+            increaseCounter(hashCode);
         }
         return optionalUrl;
     }
@@ -68,6 +67,13 @@ public class UrlServiceImpl implements UrlService {
         }
         Collection<Url> urls = urlRepository.findAllBySite(optionalSite.get());
         return mapper.getResponseStatisticDTO(urls);
+    }
+
+    private void increaseCounter(String hashCode) {
+        crudRepository.runWithConfirm(
+                "UPDATE Url SET counter = counter + 1 WHERE hashCode = :fHashCode",
+                Map.of("fHashCode", hashCode)
+        );
     }
 
     private String getHashCode() {
