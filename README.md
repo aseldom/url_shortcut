@@ -1,4 +1,4 @@
-# job4j_url_shortcut
+# url_shortcut
 
 Данный проект представляет web-приложение по выдаче сокращенных ссылок.
 
@@ -61,5 +61,9 @@
 ---
 #### Взаимодействие с приложением удобнее осуществлять через [Postman](https://www.postman.com/)
 
+---
+#### Контакты для связи:
+* email: a.seldom@gmail.com
+* telegram: @aseldom       
 
              
